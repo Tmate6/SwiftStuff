@@ -1,13 +1,13 @@
 //
 //  ContentView.swift
-//  HomeAPItest
+//  ArrangeableWidgets
 //
 //  Created by Mate Tohai on 2023. 06. 30..
 //
 
 import SwiftUI
 
-struct widget: Identifiable {
+struct Widget: Identifiable {
     var id: UUID = UUID()
     var width: Int = 1
 }
@@ -16,7 +16,7 @@ struct ContentView: View {
     @State private var originalSelected: Int? = nil
     @State private var selected: Int? = nil
     @State private var position: CGPoint = .zero
-    @State private var widgets: [widget] = [widget(), widget(width: 3), widget(), widget(width: 2)]
+    @State private var widgets: [Widget] = [Widget(), Widget(width: 3), Widget(), Widget(width: 2)]
     
     var body: some View {
         GroupBox {
@@ -31,7 +31,7 @@ struct ContentView: View {
                     GridRow {
                         ForEach(widgets) { widget in
                             GroupBox {
-                                Text("e")
+                                Image(systemname: "placeholdertext.fill")
                                     .frame(maxWidth: .infinity)
                             }
                             .overlay(
@@ -53,15 +53,11 @@ struct ContentView: View {
                             
                             for widget in widgets {
                                 if Int(position.x / segmentWidth) < (widgets.firstIndex(where: {$0.id == widget.id})! + previousAddedCoumns + widget.width) && Int(position.x / segmentWidth) > (widgets.firstIndex(where: {$0.id == widget.id})! + previousAddedCoumns - widget.width) {
-                                    
                                     selected = widgets.firstIndex(where: {$0.id == widget.id})!
-                                    
                                     break
                                 }
-                                
                                 previousAddedCoumns += widget.width - 1
                             }
-                            
                             if originalSelected == nil {
                                 originalSelected = selected
                             }
