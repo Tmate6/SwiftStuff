@@ -1,1 +1,1 @@
-Simeple joystick-like control view
+Simple joystick-like control view
