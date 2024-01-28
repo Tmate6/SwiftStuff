@@ -8,12 +8,12 @@
 import SwiftUI
 import Foundation
 
-struct JoystickView: View {
+struct CircularDragControlView: View {
     @State private var mid: CGPoint = CGPoint(x: 0, y: 0)
+    @State private var radius: CGFloat = 0 // Radius of bounds circle. Change in .onAppear to modity size
     @State private var pos: CGPoint = CGPoint(x: 50, y: 50)
     
     @GestureState private var fingerPos: CGPoint? = nil
-    
     @GestureState private var startPos: CGPoint? = nil
     
     // Used for snapping to mid
@@ -57,12 +57,21 @@ struct JoystickView: View {
                     newPos = mid
                 }
                 
+                self.angle = 180 - Int(atan2(newPos.x - mid.x, newPos.y - mid.y) * (180.0 / .pi)) // Angle in degrees
+                
+                var newDistance: Int = Int((CGFloat(sqrt(pow(newPos.x - mid.x, 2) + pow(newPos.y - mid.y, 2))) / radius) * 100)
+                
+                // Stop from going outside bounds
+                if newDistance > 100 {
+                    let angle = atan2(newPos.y - mid.y, newPos.x - mid.x) // Angle in radians... i think
+                    newPos.x = mid.x + radius * cos(angle)
+                    newPos.y = mid.y + radius * sin(angle)
+                    newDistance = 100
+                }
+                
+                self.distance = newDistance
                 self.pos = newPos
                 
-                self.angle = 180 - Int(atan2(pos.x - mid.x, pos.y - mid.y) * (180.0 / .pi))
-                self.distance = Int(sqrt(pow(pos.x - mid.x, 2) + pow(pos.y - mid.y, 2)))
-                
-                print(self.distance, self.angle)
                 
             }
             .updating($startPos) { (value, startPos, transaction) in
@@ -95,12 +104,17 @@ struct JoystickView: View {
                 
                 Circle()
                     .stroke(Color.gray)
-                    .frame(width: 60, height: 60)
+                    .frame(width: 60)
+                    .position(mid)
+                
+                Circle()
+                    .stroke(Color.gray, lineWidth: 4)
+                    .frame(width: radius*2)
                     .position(mid)
                 
                 Circle()
                     .foregroundColor(.white)
-                    .frame(width: 50, height: 50)
+                    .frame(width: 50)
                     .position(pos)
                     .gesture(
                         simpleDrag.simultaneously(with: fingerDrag)
@@ -109,6 +123,7 @@ struct JoystickView: View {
             .onAppear {
                 mid = CGPoint(x: geometry.size.width/2, y: geometry.size.height/2)
                 pos = mid
+                radius = geometry.size.width/2
             }
         }
     }
@@ -117,7 +132,7 @@ struct JoystickView: View {
 struct ContentView: View {
     var body: some View {
         GroupBox {
-            JoystickView()
+            CircularDragControlView()
         }
         .aspectRatio(contentMode: .fit)
         .padding()
@@ -129,5 +144,3 @@ struct ContentView_Previews: PreviewProvider {
         ContentView()
     }
 }
-
-
