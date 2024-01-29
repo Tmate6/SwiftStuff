@@ -8,7 +8,7 @@
 import SwiftUI
 import Foundation
 
-struct CircularDragControlView: View {
+struct JoystickView: View {
     @State private var mid: CGPoint = CGPoint(x: 0, y: 0)
     @State private var radius: CGFloat = 0 // Radius of bounds circle. Change in .onAppear to modity size
     @State private var pos: CGPoint = CGPoint(x: 50, y: 50)
@@ -16,12 +16,12 @@ struct CircularDragControlView: View {
     @GestureState private var fingerPos: CGPoint? = nil
     @GestureState private var startPos: CGPoint? = nil
     
-    // Used for snapping to mid
+    // Used for snapping to mid, dont like it but works
     @State private var incrementalStartPos: CGPoint = CGPoint(x: 50, y: 50)
     @State private var cycles: UInt16 = 0
     
-    @State private var distance: Int = 0
-    @State private var angle: Int = 0
+    @Binding var distance: Int
+    @Binding var angle: Int
     
     var simpleDrag: some Gesture {
         DragGesture()
@@ -130,9 +130,12 @@ struct CircularDragControlView: View {
 }
 
 struct ContentView: View {
+    @State var distance: Int = 0
+    @State var angle: Int = 0
+    
     var body: some View {
         GroupBox {
-            CircularDragControlView()
+            JoystickView(distance: $distance, angle: $angle)
         }
         .aspectRatio(contentMode: .fit)
         .padding()
